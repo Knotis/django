@@ -198,7 +198,16 @@ class Options(object):
                 field.primary_key = True
                 self.setup_pk(field)
             else:
-                auto = AutoField(verbose_name='ID', primary_key=True,
+                if hasattr(settings,'CUSTOM_AUTOFIELD_CLASS'):
+                    import importlib
+                    mod_path = settings.CUSTOM_AUTOFIELD_CLASS.split('.')
+                    module = importlib.import_module('.'.join(mod_path[:-1]))
+                    auto_class = getattr(module, mod_path[-1])
+
+                else:
+                    auto_class = AutoField
+
+                auto = auto_class(verbose_name='ID', primary_key=True,
                         auto_created=True)
                 model.add_to_class('id', auto)
 
